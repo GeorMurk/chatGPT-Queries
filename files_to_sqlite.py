@@ -25,33 +25,52 @@ while flag:
             # extract the excel files
             zip_file.extractall()
 
-            # try to read the retail and wholesale excel files into dataframes
+            # try to read the retail excel file into a dataframe
             try:
                 retail_df = pd.read_excel("retail.xlsx")
+            except:
+                # set the dataframe to None if the file is corrupt
+                retail_df = None
+
+            # try to read the wholesale excel file into a dataframe
+            try:
                 wholesale_df = pd.read_excel("wholesale.xlsx")
             except:
-                # skip the rest of the loop if the excel files are corrupt
-                continue
+                # set the dataframe to None if the file is corrupt
+                wholesale_df = None
 
             # get the sheet names
             sheet_names = retail_df.sheet_names
 
             # loop through the sheet names
             for sheet_name in sheet_names:
-                # save the sheet as a csv file
-                retail_df.parse(sheet_name).to_csv("{}.csv".format(sheet_name))
-                wholesale_df.parse(sheet_name).to_csv("{}.csv".format(sheet_name))
+                # check if the retail dataframe is not None
+                if retail_df is not None:
+                    # save the sheet as a csv file
+                    retail_df.parse(sheet_name).to_csv("{}.csv".format(sheet_name))
 
-                # read the csv files into dataframes
-                retail_df = pd.read_csv("{}.csv".format(sheet_name))
-                wholesale_df = pd.read_csv("{}.csv".format(sheet_name))
+                    # read the csv file into a dataframe
+                    retail_df = pd.read_csv("{}.csv".format(sheet_name))
 
-                # save the dataframes to the sqlite databases
-                retail_df.to_sql("{}".format(sheet_name), conn_retail, if_exists="replace")
-                wholesale_df.to_sql("{}".format(sheet_name), conn_wholesale, if_exists="replace")
+                    # save the dataframe to the sqlite database
+                    retail_df.to_sql("{}".format(sheet_name), conn_retail, if_exists="replace")
 
-                # delete the csv files
-                os.remove("{}.csv".format(sheet_name))
+                    # delete the csv file
+                    os.remove("{}.csv".format(sheet_name))
+
+                # check if the wholesale dataframe is not None
+                if wholesale_df is not None:
+                    # save the sheet as a csv file
+                    wholesale_df.parse(sheet_name).to_csv("{}.csv".format(sheet_name))
+
+                    # read the csv file into a dataframe
+                    wholesale_df = pd.read_csv("{}.csv".format(sheet_name))
+
+                    # save the dataframe to the sqlite database
+                    wholesale_df.to_sql("{}".format(sheet_name), conn_wholesale, if_exists="replace")
+
+                    # delete the csv file
+                    os.remove("{}.csv".format(sheet_name))
 
         # increment the counter
         i += 1
