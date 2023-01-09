@@ -25,9 +25,13 @@ while flag:
             # extract the excel files
             zip_file.extractall()
 
-            # read the retail and wholesale excel files into dataframes
-            retail_df = pd.read_excel("retail.xlsx")
-            wholesale_df = pd.read_excel("wholesale.xlsx")
+            # try to read the retail and wholesale excel files into dataframes
+            try:
+                retail_df = pd.read_excel("retail.xlsx")
+                wholesale_df = pd.read_excel("wholesale.xlsx")
+            except:
+                # skip the rest of the loop if the excel files are corrupt
+                continue
 
             # get the sheet names
             sheet_names = retail_df.sheet_names
